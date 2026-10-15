@@ -1,2 +1,2 @@
 # rentflow-equipment-rental-system
-A full-stack equipment rental and resource management system built with React, Tailwind CSS, Express.js, and MongoDB. 
+A full-stack event equipment rental management system featuring inventory tracking, multi-item reservations, rental operations, role-based access, and business analytics.
