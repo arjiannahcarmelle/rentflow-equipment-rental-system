@@ -1,4 +1,4 @@
-# RentFlow — Week 11 Development Progress
+# RentFlow - Week 11 Development Progress
 
 **Project Title:** RentFlow: A Web-Based Equipment Rental and Resource Management System
 **Development Week:** Week 11
