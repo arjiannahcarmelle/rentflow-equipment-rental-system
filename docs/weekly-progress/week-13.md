@@ -111,11 +111,21 @@ HTTP status codes and response data.
 - The backend endpoints are intended for local development
   until authentication and authorization are implemented.
 
-## 6. Evidence
+## 6. Screenshots and Evidence
 
 Screenshots are stored in:
 
-docs/screenshots/week-13/
+`docs/screenshots/week-13/`
+
+Evidence includes:
+
+1. Frontend–Backend API Connection
+2. Live Equipment Catalog
+3. Equipment Reservation Form
+4. Successful Reservation Creation
+5. Successful Reservation Retrieval
+6. Successful Individual Reservation Retrieval
+7. Frontend Lint and Build Validation
 
 ## 7. Next Development Focus
 
