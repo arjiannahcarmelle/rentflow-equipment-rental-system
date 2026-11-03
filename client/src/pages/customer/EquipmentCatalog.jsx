@@ -1,32 +1,44 @@
 
-const equipment = [
-  {
-    id: 1,
-    name: 'Professional Sound System',
-    category: 'Audio Equipment',
-    description: 'Complete sound system for events and gatherings.',
-    rate: 2500,
-    available: true,
-  },
-  {
-    id: 2,
-    name: 'LED Stage Lighting',
-    category: 'Lighting',
-    description: 'Professional lighting setup for indoor and outdoor events.',
-    rate: 1800,
-    available: true,
-  },
-  {
-    id: 3,
-    name: 'Projector and Screen',
-    category: 'Visual Equipment',
-    description: 'Projection equipment for presentations and events.',
-    rate: 1200,
-    available: false,
-  },
-]
+import { useEffect, useState } from 'react'
+import { equipmentAPI } from '../../services/api'
 
 function EquipmentCatalog() {
+  const [equipment, setEquipment] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let active = true
+
+    async function loadEquipment() {
+      try {
+        const data = await equipmentAPI.getAll()
+
+        if (active) {
+          if (!Array.isArray(data)) {
+            throw new Error('Unexpected equipment response format.')
+          }
+
+          setEquipment(data.filter((item) => item.isActive))
+        }
+      } catch (err) {
+        if (active) {
+          setError(err.message)
+        }
+      } finally {
+        if (active) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadEquipment()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
   const formatCurrency = (amount) =>
     new Intl.NumberFormat('en-PH', {
       style: 'currency',
@@ -46,72 +58,95 @@ function EquipmentCatalog() {
         </h1>
 
         <p className="mt-2 text-slate-500">
-          Explore equipment for your upcoming events.
+          Explore rental equipment for your upcoming events.
         </p>
       </div>
 
-      <p className="rounded-lg bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
-        Demo catalog — equipment details, prices, and availability
-        are illustrative only.
-      </p>
+      {loading && (
+        <p role="status" className="rounded-lg bg-slate-100 p-5 text-slate-600">
+          Loading equipment...
+        </p>
+      )}
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {equipment.map((item) => (
-          <article
-            key={item.id}
-            className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
-          >
-            <div className="flex h-40 items-center justify-center bg-slate-100">
-              <span className="text-sm font-medium text-slate-400">
-                Equipment Image
-              </span>
-            </div>
+      {error && (
+        <p role="alert" className="rounded-lg bg-red-50 p-5 text-red-700">
+          Unable to load equipment: {error}
+        </p>
+      )}
 
-            <div className="space-y-4 p-6">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
-                  {item.category}
-                </p>
+      {!loading && !error && equipment.length === 0 && (
+        <p className="rounded-lg bg-slate-100 p-5 text-slate-600">
+          No active equipment is currently listed.
+        </p>
+      )}
 
-                <h2 className="mt-2 text-lg font-bold text-slate-900">
-                  {item.name}
-                </h2>
+      {!loading && !error && equipment.length > 0 && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {equipment.map((item) => {
+            const available = item.totalQuantity > 0
 
-                <p className="mt-2 text-sm leading-6 text-slate-500">
-                  {item.description}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <p className="font-bold text-slate-900">
-                  {formatCurrency(item.rate)}
-                  <span className="text-xs font-normal text-slate-500">
-                    {' '}/day
-                  </span>
-                </p>
-
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    item.available
-                      ? 'bg-emerald-50 text-emerald-700'
-                      : 'bg-rose-50 text-rose-700'
-                  }`}
-                >
-                  {item.available ? 'Available' : 'Unavailable'}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                disabled
-                className="w-full cursor-not-allowed rounded-lg bg-slate-200 px-4 py-3 text-sm font-semibold text-slate-500"
+            return (
+              <article
+                key={item._id}
+                className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
               >
-                Reserve (Coming Soon)
-              </button>
-            </div>
-          </article>
-        ))}
-      </div>
+                <div className="flex h-40 items-center justify-center bg-slate-100">
+                  <span className="text-sm font-medium text-slate-400">
+                    Equipment Image
+                  </span>
+                </div>
+
+                <div className="space-y-4 p-6">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
+                      {item.category}
+                    </p>
+
+                    <h2 className="mt-2 text-lg font-bold text-slate-900">
+                      {item.name}
+                    </h2>
+
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                      {item.description || 'No description available.'}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-bold text-slate-900">
+                      {formatCurrency(item.dailyRate)}
+                      <span className="text-xs font-normal text-slate-500">
+                        {' '}/day
+                      </span>
+                    </p>
+
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        available
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-rose-50 text-rose-700'
+                      }`}
+                    >
+                      {available ? 'In Stock' : 'Out of Stock'}
+                    </span>
+                  </div>
+
+                  <p className="text-sm text-slate-500">
+                    Inventory quantity: {item.totalQuantity}
+                  </p>
+
+                  <button
+                    type="button"
+                    disabled
+                    className="w-full cursor-not-allowed rounded-lg bg-slate-200 px-4 py-3 text-sm font-semibold text-slate-500"
+                  >
+                    Reserve (Coming Soon)
+                  </button>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
