@@ -9,6 +9,8 @@ import StaffDashboard from './pages/staff/StaffDashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import EquipmentCatalog from './pages/customer/EquipmentCatalog'
 import MyReservations from './pages/customer/MyReservations'
+import ApiTestPage from './pages/public/ApiTestPage'
+import ReservationForm from './components/reservations/ReservationForm'
 
 function Page({ title, description }) {
   return (
@@ -44,6 +46,10 @@ function App() {
         <Route path="/equipment" element={<EquipmentCatalog />} />
 
         <Route path="/my-reservations" element={<MyReservations />} />
+
+        <Route path="/api-test" element={<ApiTestPage />} />
+
+        <Route path="/reserve" element={<ReservationForm />} />
 
           <Route
             path="*"
